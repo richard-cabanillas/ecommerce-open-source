@@ -1,6 +1,7 @@
 <?php
 
 namespace Webkul\Admin\Listeners;
+use Illuminate\Support\Facades\Log;
 
 use Webkul\Admin\Mail\Order\CanceledNotification;
 use Webkul\Admin\Mail\Order\CreatedNotification;
@@ -25,6 +26,24 @@ class Order extends Base
             report($e);
         }
     }
+
+/* 
+
+*/
+
+
+  public function afterInvoiced($order)
+    {
+        try {
+            Log::info('📧 Enviando correo de factura para la orden ID: ' . $order->id);
+
+            $this->prepareMail($order, new \Webkul\Admin\Mail\Order\InvoicedNotification($order));
+        } catch (\Exception $e) {
+            Log::error('❌ Error al enviar correo de factura: ' . $e->getMessage());
+            report($e);
+        }
+    }
+
 
     /**
      * Send cancel order mail.

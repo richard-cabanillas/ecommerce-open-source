@@ -1,6 +1,7 @@
 <?php
 
 namespace Webkul\Sales\Models;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -331,22 +332,39 @@ class Order extends Model implements OrderContract
     /**
      * Checks if new invoice is allow or not.
      */
-    public function canInvoice(): bool
-    {
-        foreach ($this->items as $item) {
-            if (
-                $item->canInvoice()
-                && ! in_array($item->order->status, [
-                    self::STATUS_CLOSED,
-                    self::STATUS_FRAUD,
-                ])
-            ) {
-                return true;
-            }
-        }
-
+public function canInvoice(): bool
+{
+    // ✅ Si el pedido ya tiene al menos una factura, no se puede generar otra
+    if ($this->invoices()->exists()) {
         return false;
     }
+
+    // ✅ Si es pago contra entrega, verificar que no esté cerrado o cancelado
+    if ($this->payment && $this->payment->method === 'cashondelivery') {
+        return !in_array($this->status, [
+            self::STATUS_CLOSED,
+            self::STATUS_FRAUD,
+            self::STATUS_CANCELED,
+        ]);
+    }
+
+    // ✅ Verificar si hay productos por facturar
+    foreach ($this->items as $item) {
+        if ($item->canInvoice() && !in_array($this->status, [
+            self::STATUS_CLOSED,
+            self::STATUS_FRAUD,
+        ])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
+
+
 
     /**
      * Checks if order can be canceled or not.

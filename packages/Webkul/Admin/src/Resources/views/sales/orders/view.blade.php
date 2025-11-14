@@ -55,6 +55,7 @@
                 && bouncer()->hasPermission('sales.invoices.create')
                 && $order->payment->method !== 'paypal_standard'
             )
+            
                 @include('admin::sales.invoices.create')
             @endif
 
@@ -709,16 +710,18 @@
 
                             @php $additionalDetails = \Webkul\Payment\Payment::getAdditionalDetails($order->payment->method); @endphp
 
-                            <!-- Additional details -->
-                            @if (! empty($additionalDetails))
-                                <p class="pt-4 font-semibold text-gray-800 dark:text-white">
-                                    {{ $additionalDetails['title'] }}
-                                </p>
-
-                                <p class="text-gray-600 dark:text-gray-300">
-                                    {{ $additionalDetails['value'] }}
-                                </p>
-                            @endif
+            <!-- Mostrar detalles adicionales SOLO si es contra entrega y no tiene factura -->
+                    @if (! empty($additionalDetails))
+                        @if ($order->payment->method == 'cashondelivery' && ! $order->invoices()->exists())
+                            <p class="pt-4 font-semibold text-gray-800 dark:text-white">
+                                {{ $additionalDetails['title'] }}
+                            </p>
+                        
+                            <p class="text-gray-600 dark:text-gray-300">
+                                {{ $additionalDetails['value'] }}
+                            </p>
+                        @endif
+                    @endif
 
                             {!! view_render_event('bagisto.admin.sales.order.payment-method.after', ['order' => $order]) !!}
                         </div>

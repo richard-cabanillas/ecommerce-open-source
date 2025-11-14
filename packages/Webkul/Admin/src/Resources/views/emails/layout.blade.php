@@ -15,7 +15,7 @@
                 <!-- Email Header -->
                 <div style="margin-bottom: 65px;">
                     <a href="{{ route('shop.home.index') }}">
-                        @if ($logo = core()->getConfigData('general.design.admin_logo.logo_image'))
+                        {{-- @if ($logo = core()->getConfigData('general.design.admin_logo.logo_image'))
                             <img
                                 src="{{ Storage::url($logo) }}"
                                 alt="{{ config('app.name') }}"
@@ -27,7 +27,15 @@
                                 alt="{{ config('app.name') }}"
                                 style="width: 156px;height: 40px;"
                             />
-                        @endif
+                        @endif --}}
+                        {{-- esta en comentario cuando este en un hosting va funcionar osea en produccion--}}
+                    
+                        <img
+                            src="https://res.cloudinary.com/di0v74jtd/image/upload/v1763064605/logo-anahui_jdvp5j.png"
+                            alt="Corporación Anahui"
+                            style="height: 40px; width: 110px;"
+                        />
+                    
                     </a>
                 </div>
 
